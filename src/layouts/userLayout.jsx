@@ -1,6 +1,5 @@
 import Header from '../components/header'
 
-import {Container} from '@material-ui/core'
 const UserLayout = ({children}) => {
   return(
     <>
