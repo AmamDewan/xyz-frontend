@@ -1,6 +1,6 @@
 import {useState} from 'react' 
 import {ArrowRightAlt} from '@material-ui/icons'
-import {TextField, Button} from '@material-ui/core'
+import {TextField, Button, CircularProgress} from '@material-ui/core'
 import cookies from 'js-cookies'
 import {userLogin, userRegister} from '../../helpers/authHelper'
 // import Header from '../../components/header'
@@ -12,6 +12,12 @@ const useStyles = makeStyles((theme)=>({
         background:'#F3F4F6',
         border:'none',
         fontWeight: '700'
+    },
+    spinner:{
+        color: 'white',
+        width: '20px !important',
+        height: '20px !important',
+        marginRight: '5px'
     }
 }))
 const Home = () => {
@@ -25,11 +31,13 @@ const Home = () => {
 
     const [warning, setWarning] = useState('')
     const [success, setSuccess] = useState('')
+    const [loading, setLoading] = useState(false)
 
     const loginHandler = async(e) => {
         e.preventDefault()
         setWarning('')
         setSuccess('')
+        setLoading(true)
 
         const res = await userLogin({username, password})
         if (res.status === 200)
@@ -43,10 +51,12 @@ const Home = () => {
         e.preventDefault()
         setWarning('')
         setSuccess('')
+        setLoading(true)
 
         const res = await userRegister({username, email, password, confirm_password})
         if (res.status === 201)
             setSuccess("User Created Successfully!");
+            setLoading(false)
         if (res.status === 400){
             let error
             for (error in res.data)
@@ -112,7 +122,7 @@ const Home = () => {
                         />
                     )}
                     <Button variant="contained" color="primary" type="submit">
-                        {isSignup ? 'SIGN UP' : 'LOG IN'}
+                        {loading &&<CircularProgress  className={classes.spinner}/>} {isSignup ? 'SIGN UP' : 'LOG IN'}
                     </Button>
                     </form>
                 </div>

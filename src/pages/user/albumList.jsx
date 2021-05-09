@@ -1,40 +1,31 @@
 import {useEffect, useState} from 'react'
-import {Add} from '@material-ui/icons'
-import {Fab, Tooltip, Modal} from '@material-ui/core'
+import {Add, Close} from '@material-ui/icons'
+import {Fab, Tooltip, Modal, makeStyles} from '@material-ui/core'
 import {Link} from 'react-router-dom'
 import UserLayout from '../../layouts/userLayout'
-import {getAlbums} from '../../helpers/albumHelper'
+import {getAlbums, createAlbum} from '../../helpers/albumHelper'
 
-// const tileData = [
-//   {
-//     img: 'https://picsum.photos/seed/1/320/200/?blur',
-//     title: 'Album Name',
-//   },
-//   {
-//     img: 'https://picsum.photos/seed/2/300/250/?blur',
-//     title: 'Album Name',
-//   },
-//   {
-//     img: 'https://picsum.photos/seed/3/300/200/?blur',
-//     title: 'Album Name',
-//   },
-//   {
-//     img: 'https://picsum.photos/seed/4/300/200/?blur',
-//     title: 'Album Name',
-//   },
-//   {
-//     img: 'https://picsum.photos/seed/5/300/200/?blur',
-//     title: 'Album Name',
-//   },
-//   {
-//     img: 'https://picsum.photos/seed/6/300/200/?blur',
-//     title: 'Album Name',
-//   },
-// ];
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    position: 'absolute',
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: '0.5rem',
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+    bottom:'2rem',
+    right: '3rem',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+}));
+
 
 const Albums = () => {
+  const classes = useStyles()
   const [albums, setAlbums] = useState([])
   const [open, setOpen] = useState(false);
+  const [albumName, setAlbumName] = useState('');
 
   const handleOpen = () => {
     setOpen(true);
@@ -43,6 +34,11 @@ const Albums = () => {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const handleCreate = async() => {
+    const res = await createAlbum({title: albumName, owner: 1})
+    console.log(res)
+  }
 
   useEffect(()=>{
     getAlbums().then(res=>setAlbums(res.data))
@@ -62,9 +58,11 @@ const Albums = () => {
           </div>
         </Link>
       ))}
-      {/* <div className="cursor-pointer mb-6 my-auto border-dashed border-2 border-gray-400 rounded-lg flex items-center justify-center h-36 text-5xl text-gray-400">
+      {/*
+        <div className="cursor-pointer mb-6 my-auto border-dashed border-2 border-gray-400 rounded-lg flex items-center justify-center h-36 text-5xl text-gray-400">
           <AddCircleOutline fontSize="large" />
-      </div> */}
+        </div>
+      */}
     </div>
     <div className="fixed bottom-5 right-8 p-0 cursor-pointer bg-gray-300 rounded-full flex items-center justify-center text-5xl text-gray-400">
       <Tooltip title="Add" aria-label="add">
@@ -73,6 +71,23 @@ const Albums = () => {
         </Fab>
       </Tooltip>
     </div>
+    <Modal
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="simple-modal-title"
+      aria-describedby="simple-modal-description"
+    >
+       <div  className={classes.paper}>
+         <div className="relative">
+            <Close className="absolute -right-6 -top-3 cursor-pointer" onClick={handleClose} />
+         </div>
+        <h2 className="text-xl font-semibold">Create A New Album</h2>
+        <input className="border-2 border-gray-300 rounded my-2 px-2" type="text" placeholder="Album Name" value={albumName} onChange={(e)=>{setAlbumName(e.target.value)}}/>
+        <div className="text-center">
+          <button className="bg-blue-400 px-4 py-1" onClick={handleCreate}>Create</button>
+        </div>
+      </div>
+    </Modal>
   </UserLayout>
   )
 }

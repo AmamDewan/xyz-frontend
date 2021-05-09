@@ -30,19 +30,20 @@ export const getAlbum = async(id) => {
   }
 } 
 
-export const uploadPhoto = async(data) => {
-  const formData = new FormData()
-
-  formData.append('title', data.title)
-  formData.append('album', data.album)
-  formData.append('url', fs.createReadStream(data.url))
+export const createAlbum = async(data) => {
   try{
-    console.log('data',data);
-    console.log('form',formData);
-    const res = await axios.post(`${API}/albums/${data.album}/photos/`, formData, {
+    const res = await axios.post(`${API}/albums/`, data, authHeader)
+    return res
+  } catch (err) {
+    return err.response
+  }
+} 
+
+export const uploadPhoto = async(id, data) => {
+  try{
+    const res = await axios.post(`${API}/albums/${id}/photos/`, data, {
       headers: {
         'Authorization': `Token ${token}`,
-        ...formData.getHeaders()
       }
     })
     return res

@@ -2,44 +2,10 @@ import {useEffect, useState} from 'react'
 import {GridList, GridListTile, makeStyles, Button} from '@material-ui/core'
 import {AddPhotoAlternate} from '@material-ui/icons'
 import ModalImage from 'react-modal-image'
-import fs from 'fs'
 
 import {getAlbum, uploadPhoto} from '../../helpers/albumHelper' 
 import UserLayout from '../../layouts/userLayout'
 
-
-// const tileData = [
-//   {
-//     img: 'https://picsum.photos/seed/1/320/200/?blur',
-//     imgL: 'https://picsum.photos/seed/1/900/600/',
-//     title: 'Photo Title',
-//   },
-//   {
-//     img: 'https://picsum.photos/seed/2/300/250/?blur',
-//     imgL: 'https://picsum.photos/seed/2/300/200/',
-//     title: 'Photo Title',
-//   },
-//   {
-//     img: 'https://picsum.photos/seed/3/300/200/?blur',
-//     imgL: 'https://picsum.photos/seed/3/300/200/',
-//     title: 'Photo Title',
-//   },
-//   {
-//     img: 'https://picsum.photos/seed/4/300/200/?blur',
-//     imgL: 'https://picsum.photos/seed/1/300/200/',
-//     title: 'Photo Title',
-//   },
-//   {
-//     img: 'https://picsum.photos/seed/5/300/200/?blur',
-//     imgL: 'https://picsum.photos/seed/1/300/200/',
-//     title: 'Photo Title',
-//   },
-//   {
-//     img: 'https://picsum.photos/seed/6/300/200/?blur',
-//     imgL: 'https://picsum.photos/seed/1/300/200/',
-//     title: 'Photo Title',
-//   },
-// ];
 
 const useStyles = makeStyles((theme)=>({
   gridTileAdd:{
@@ -61,6 +27,7 @@ const useStyles = makeStyles((theme)=>({
 const AlbumDetail = ({match: {params}}) => {
   const classes = useStyles()
   const [album, setAlbum] = useState({title:'a title', photos:[]})
+  const [file, setFile] = useState()
 
   useEffect(()=>{
     getAlbum(params.id).then(res=>{
@@ -70,14 +37,24 @@ const AlbumDetail = ({match: {params}}) => {
     })
   },[params.id])
 
-  const uploadHandler = async(file) => {
-    console.log(file);
-    const res = await uploadPhoto({title:'A photo title', url:file, album:params.id})
+  
+  const uploadHandler = async() => {
+    // console.log(file);
+    
+    let formdata = new FormData()
+    formdata.append('url', file)
+    formdata.append('album', params.id)
+    
+    const res = await uploadPhoto(params.id, formdata)
     console.log(res);
+    
   }
 
+  const handleFile = (e) => {
+    setFile(e.target.files[0]);
+    uploadHandler()
+  } 
 
-  console.log(album);
   return(
     <UserLayout>
       <h3 className="text-3xl font-light mt-5 uppercase">{album && album.title}</h3>
@@ -89,12 +66,19 @@ const AlbumDetail = ({match: {params}}) => {
           </GridListTile>
         ))}
       </GridList>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 my-4 relative">
+        {album && album.photos.length>0 && album.photos.map((photo, index)=>(
+          <div key={index} className="cursor-pointer w-full h-36 overflow-hidden rounded relative bg-gray-200">
+            <ModalImage small={photo.url} large={photo.url} className={classes.gridListTile}/>
+          </div>
+        ))}
+      </div>
       <input
         accept="image/*"
         className="hidden"
         id="contained-button-file"
         type="file"
-        onChange={(e)=>uploadHandler(e.target.value)}
+        onChange={(e)=>handleFile(e)}
       />
       <label htmlFor="contained-button-file" className="flex justify-center">
         <Button variant="contained" color="primary" component="span">
