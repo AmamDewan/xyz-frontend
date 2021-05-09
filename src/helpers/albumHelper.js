@@ -1,10 +1,9 @@
 import axios from 'axios'
 import cookies from 'js-cookies'
-import FormData from 'form-data'
-import fs from 'fs'
 
 const API = process.env.REACT_APP_API
 const token = cookies.getItem('token')
+const user = JSON.parse(cookies.getItem('user'))
 
 const authHeader = {
   headers:{
@@ -30,7 +29,8 @@ export const getAlbum = async(id) => {
   }
 } 
 
-export const createAlbum = async(data) => {
+export const createAlbum = async(title, is_public) => {
+  const data = {title, is_public, owner: user.id}
   try{
     const res = await axios.post(`${API}/albums/`, data, authHeader)
     return res

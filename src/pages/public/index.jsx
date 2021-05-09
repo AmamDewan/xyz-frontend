@@ -1,10 +1,12 @@
-import {useState} from 'react' 
+import {useState} from 'react'
 import {ArrowRightAlt} from '@material-ui/icons'
-import {TextField, Button, CircularProgress} from '@material-ui/core'
+import {TextField, Button} from '@material-ui/core'
 import cookies from 'js-cookies'
 import {userLogin, userRegister} from '../../helpers/authHelper'
-// import Header from '../../components/header'
 import { makeStyles } from '@material-ui/core/styles';
+import Spinner from '../../components/spinner'
+
+import logo from '../../assets/logo-white.png'
 
 const useStyles = makeStyles((theme)=>({
     input: {
@@ -12,12 +14,6 @@ const useStyles = makeStyles((theme)=>({
         background:'#F3F4F6',
         border:'none',
         fontWeight: '700'
-    },
-    spinner:{
-        color: 'white',
-        width: '20px !important',
-        height: '20px !important',
-        marginRight: '5px'
     }
 }))
 const Home = () => {
@@ -40,9 +36,11 @@ const Home = () => {
         setLoading(true)
 
         const res = await userLogin({username, password})
-        if (res.status === 200)
+        console.log(res);
+        if (res.status === 200)  
             cookies.setItem('exUser', true, { expires: 7 })
             cookies.setItem('token', res.data.auth_token)
+            cookies.setItem('user', JSON.stringify(res.data))
             window.location = "/albums"
         if (res.status === 400)
             setWarning('Unable to login with provided credentials!')
@@ -66,75 +64,81 @@ const Home = () => {
 
     return (
         <>
-            <div className="bg-gray-300 flex flex-col justify-center h-screen landing-bg md:p-16">
-                <div className="bg-white w-72 mx-auto md:ml-auto md:mr-16 rounded-lg p-6">
-                    <h3 className="text-center mb-4 text-2xl font-semibold">{isSignup ? 'SIGN UP' : 'LOG IN'}</h3>
-                    {warning && (<p className="mb-4 text-red-500 text-sm bg-red-100 rounded p-2 border border-red-500">{warning}</p>)}
-                    {success && (<p className="mb-4 text-green-500 text-sm bg-green-100 rounded p-2 border border-green-500">{success}</p>)}
-                    <form className="flex flex-col" onSubmit={isSignup ? registerHandler:loginHandler}>
-                    <TextField
-                        className={classes.input}
-                        required
-                        id="outlined-required"
-                        label="USERNAME"
-                        variant="outlined"
-                        size="small"
-                        value={username}
-                        onChange={(e)=>setUsername(e.target.value)}
-                        />
-                    {isSignup && (
+            <div className="bg-gray-300 flex flex-col md:flex-row justify-center md:justify-between items-center h-screen landing-bg py-5 md:p-16">
+                <div className="text-center mx-auto text-white self-end">
+                    <img className="w-32 md:w-52 mx-auto md:mb-4" src={logo} alt="Logo" />
+                    <h1 className="text-xl md:text-3xl font-bold mb-4">The home of your memories</h1>
+                </div>
+                <div className="flex flex-col justify-center items-center md:bg-black md:bg-opacity-75 md:h-screen md:w-1/2 md:-mr-16 md:pr-16 md:pl-8 lg:pl-0">
+                    <div className="bg-white w-72 mx-auto md:ml-auto md:mr-16 rounded-lg p-6">
+                        <h3 className="text-center mb-4 text-2xl font-semibold">{isSignup ? 'SIGN UP' : 'LOG IN'}</h3>
+                        {warning && (<p className="mb-4 text-red-500 text-sm bg-red-100 rounded p-2 border border-red-500">{warning}</p>)}
+                        {success && (<p className="mb-4 text-green-500 text-sm bg-green-100 rounded p-2 border border-green-500">{success}</p>)}
+                        <form className="flex flex-col" onSubmit={isSignup ? registerHandler:loginHandler}>
+                        <TextField
+                            className={classes.input}
+                            required
+                            id="outlined-required"
+                            label="USERNAME"
+                            variant="outlined"
+                            size="small"
+                            value={username}
+                            onChange={(e)=>setUsername(e.target.value)}
+                            />
+                        {isSignup && (
 
+                            <TextField
+                            className={classes.input}
+                            required
+                            id="outlined-required"
+                            label="EMAIL"
+                            variant="outlined"
+                            size="small"
+                            value={email}
+                            onChange={(e)=>setEmail(e.target.value)}
+                            />
+                        )}
                         <TextField
-                        className={classes.input}
-                        required
-                        id="outlined-required"
-                        label="EMAIL"
-                        variant="outlined"
-                        size="small"
-                        value={email}
-                        onChange={(e)=>setEmail(e.target.value)}
-                        />
-                    )}
-                    <TextField
-                        className={classes.input}
-                        required
-                        id="outlined-password-input"
-                        label="PASSWORD"
-                        type="password"
-                        autoComplete="current-password"
-                        variant="outlined"
-                        size="small"
-                        value={password}
-                        onChange={(e)=>setPassword(e.target.value)}
-                        />
-                    {isSignup && (
-                        <TextField
-                        className={classes.input}
-                        required
-                        id="outlined-password-input"
-                        label="CONFIRM PASSWORD"
-                        type="password"
-                        autoComplete="current-password"
-                        variant="outlined"
-                        size="small"
-                        value={confirm_password}
-                        onChange={(e)=>setConfirmPassword(e.target.value)}
-                        />
-                    )}
-                    <Button variant="contained" color="primary" type="submit">
-                        {loading &&<CircularProgress  className={classes.spinner}/>} {isSignup ? 'SIGN UP' : 'LOG IN'}
-                    </Button>
-                    </form>
+                            className={classes.input}
+                            required
+                            id="outlined-password-input"
+                            label="PASSWORD"
+                            type="password"
+                            autoComplete="current-password"
+                            variant="outlined"
+                            size="small"
+                            value={password}
+                            onChange={(e)=>setPassword(e.target.value)}
+                            />
+                        {isSignup && (
+                            <TextField
+                            className={classes.input}
+                            required
+                            id="outlined-password-input"
+                            label="CONFIRM PASSWORD"
+                            type="password"
+                            autoComplete="current-password"
+                            variant="outlined"
+                            size="small"
+                            value={confirm_password}
+                            onChange={(e)=>setConfirmPassword(e.target.value)}
+                            />
+                        )}
+                        <Button variant="contained" color="primary" type="submit" disabled={loading}>
+                            {loading &&<Spinner/>} {isSignup ? 'SIGN UP' : 'LOG IN'}
+                        </Button>
+                        </form>
+                    </div>
+                    {isSignup?
+                    <div onClick={()=>setIsSignup(false)} className="bg-white w-72 mx-auto md:ml-auto md:mr-16 rounded mt-3 p-4 text-center cursor-pointer">
+                        LOG IN instead?<ArrowRightAlt/>
+                    </div>
+                    :
+                    <div onClick={()=>setIsSignup(true)} className="bg-white w-72 mx-auto md:ml-auto md:mr-16 rounded mt-3 p-4 text-center cursor-pointer">
+                        SIGN UP instead?<ArrowRightAlt/>
+                    </div>
+                    }
                 </div>
-                {isSignup?
-                <div onClick={()=>setIsSignup(false)} className="bg-white w-72 mx-auto md:ml-auto md:mr-16 rounded mt-3 p-4 text-center cursor-pointer">
-                    LOG IN instead?<ArrowRightAlt/>
-                </div>
-                :
-                <div onClick={()=>setIsSignup(true)} className="bg-white w-72 mx-auto md:ml-auto md:mr-16 rounded mt-3 p-4 text-center cursor-pointer">
-                    SIGN UP instead?<ArrowRightAlt/>
-                </div>
-                }
             </div>
         </>
     )

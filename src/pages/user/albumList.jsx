@@ -4,7 +4,7 @@ import {Fab, Tooltip, Modal, makeStyles} from '@material-ui/core'
 import {Link} from 'react-router-dom'
 import UserLayout from '../../layouts/userLayout'
 import {getAlbums, createAlbum} from '../../helpers/albumHelper'
-
+import Spinner from '../../components/spinner'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -26,6 +26,9 @@ const Albums = () => {
   const [albums, setAlbums] = useState([])
   const [open, setOpen] = useState(false);
   const [albumName, setAlbumName] = useState('');
+  const [isAlbumPublic, setIsAlbumPublic] = useState(false);
+  const [loading, setLoading] = useState(false)
+  const [refresh,doRefresh] = useState(1)
 
   const handleOpen = () => {
     setOpen(true);
@@ -35,16 +38,21 @@ const Albums = () => {
     setOpen(false);
   };
 
-  const handleCreate = async() => {
-    const res = await createAlbum({title: albumName, owner: 1})
-    console.log(res)
+  const handleCreate = async(e) => {
+    e.preventDefault()
+    setLoading(true)
+
+    await createAlbum(albumName, isAlbumPublic)
+
+    doRefresh(refresh+1)
+    setLoading(false)
+    setOpen(false)
   }
 
   useEffect(()=>{
     getAlbums().then(res=>setAlbums(res.data))
-  },[])
+  },[refresh])
   
-  console.log(albums);
   return(
   <UserLayout>
     <h3 className="text-3xl font-light mt-5">Albums</h3>
@@ -82,10 +90,13 @@ const Albums = () => {
             <Close className="absolute -right-6 -top-3 cursor-pointer" onClick={handleClose} />
          </div>
         <h2 className="text-xl font-semibold">Create A New Album</h2>
-        <input className="border-2 border-gray-300 rounded my-2 px-2" type="text" placeholder="Album Name" value={albumName} onChange={(e)=>{setAlbumName(e.target.value)}}/>
-        <div className="text-center">
-          <button className="bg-blue-400 px-4 py-1" onClick={handleCreate}>Create</button>
-        </div>
+        <form onSubmit={(e)=>handleCreate(e)}>
+          <input className="border-2 border-gray-300 rounded my-2 px-2" type="text" placeholder="Album Name" value={albumName} onChange={(e)=>{setAlbumName(e.target.value)}} required/>
+          <div className="flex justify-between">
+            <span><input className="mr-1" type="checkbox" defaultChecked={isAlbumPublic} onChange={()=>setIsAlbumPublic(!isAlbumPublic)}/> Public</span>
+            <button className="bg-indigo-700 text-white px-4 py-1 flex rounded-sm" type="submit" >{loading && <Spinner color="#fff"/>}Create</button>
+          </div>
+        </form>
       </div>
     </Modal>
   </UserLayout>

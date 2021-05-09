@@ -3,6 +3,7 @@ import {Menu as MenuIcon} from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles';
 import cookies from 'js-cookies'
 import {Link} from 'react-router-dom'
+import logo from '../assets/logo-white.png'
 
 const useStyles = makeStyles((theme)=>({
     root: {
@@ -33,7 +34,7 @@ const Header = () => {
 
                 <Typography variant="h6" className={classes.title}>
                     <Link to="/albums">
-                        XYZ Photography
+                        <img className="h-12" src={logo} alt="XYZ PhotoBook"/>
                     </Link>
                 </Typography>
                 <Button color="inherit" onClick={logoutHandler}>Logout</Button>
