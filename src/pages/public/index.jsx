@@ -53,8 +53,9 @@ const Home = () => {
 
         const res = await userRegister({username, email, password, confirm_password})
         if (res.status === 201)
-            setSuccess("User Created Successfully!");
+            setSuccess("User Created Successfully! Login now");
             setLoading(false)
+            setIsSignup(false)
         if (res.status === 400){
             let error
             for (error in res.data)

@@ -35,6 +35,7 @@ export const createAlbum = async(title, is_public) => {
     const res = await axios.post(`${API}/albums/`, data, authHeader)
     return res
   } catch (err) {
+    console.log(err.response);
     return err.response
   }
 } 
@@ -48,6 +49,16 @@ export const uploadPhoto = async(id, data) => {
     })
     return res
   } catch (err) {
+    return err.response
+  }
+}
+
+export const removeAlbum = async(id) => {
+  try {
+    const res = await axios.delete(`${API}/albums/${id}/`, authHeader)
+    console.log(res);
+    return res
+  }catch (err) {
     return err.response
   }
 }
